@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Internal Server Error{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="text-center mt-5">
+                    <h1 class="display-3">500</h1>
+                    <h2 class="mb-4">Internal Server Error</h2>
+                    <p class="lead">Something went wrong on our end. Please try again later.</p>
+                    <p>If the problem persists, you can contact support.</p>
+                    <a href="/" class="btn btn-primary mt-3">Go Back to Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+    {% block head %}
+        <meta charset="utf-8">
+        <title>{{ title }} - {% block title %}{% endblock %}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="{{ description }}">
+        <meta name="keywords" content="{{ tags }}">
+        <meta name="author" content="{{ author }}">
+
+        <!-- Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <style>
+            body {
+                padding-top: 60px;
+            }
+
+            .accordian-toggle a:hover {
+                text-decoration: none !important;
+            }
+
+            .collapsed .icon-collapse-alt {
+                display: none;
+            }
+
+            .collapsed .icon-expand-alt {
+                display: inline !important;
+            }
+
+            .icon-expand-alt {
+                display: none !important;
+            }
+        </style>
+        <link rel="shortcut icon" href="{{ url_for('static', filename='ico/favicon.ico') }}">
+    {% endblock %}
+</head>
+<body>
+
+{% block navbar %}
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">{{ title }}</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item"><a class="nav-link" href="/clients">My Clients</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+{% endblock %}
+
+<div class="container page mt-5">
+    {% for message in get_flashed_messages() %}
+        <div class="flashed-message alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+
+    <div class="content">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <hr>
+
+    {% block footer %}
+        <footer class="footer text-center">
+            <p>&copy; {{ title }}</p>
+        </footer>
+    {% endblock %}
+</div>
+
+{% block js_footer %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+{% endblock %}
+</body>
+</html>

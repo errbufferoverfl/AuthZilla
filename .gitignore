@@ -108,3 +108,4 @@ cython_debug/
 instance/*
 !instance/.gitignore
 *.db
+**/.DS_Store

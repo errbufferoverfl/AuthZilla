@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}My OAuth Clients{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h2 class="my-4 text-center">My Registered OAuth Clients</h2>
+
+        <!-- Create New Client Button -->
+        <div class="text-center mb-4">
+            <a href="/clients/create" class="btn btn-success">Create New Client</a>
+        </div>
+
+        <!-- Row for displaying the clients -->
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="clients-container">
+            <!-- The cards will be dynamically added here using JavaScript -->
+        </div>
+
+        <!-- Loader while waiting for data -->
+        <div id="loading" class="text-center my-4">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+
+        <!-- Message if no clients are available -->
+        <p id="no-clients" class="text-center d-none">You haven't registered any OAuth clients yet.</p>
+    </div>
+{% endblock %}
+
+{% block js_footer %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Fetch OAuth clients via AJAX
+            fetch('/api/clients')
+                .then(response => response.json())
+                .then(data => {
+                    const clientsContainer = document.getElementById('clients-container');
+                    const loadingIndicator = document.getElementById('loading');
+                    const noClientsMessage = document.getElementById('no-clients');
+
+                    // Hide the loading indicator
+                    loadingIndicator.classList.add('d-none');
+
+                    if (data.clients && data.clients.length > 0) {
+                        // Iterate over clients and create cards
+                        data.clients.forEach(client => {
+                            const card = document.createElement('div');
+                            card.className = 'col';
+                            card.innerHTML = `
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">${client.name}</h5>
+                                <p class="card-text">
+                                    <strong>Client ID:</strong> ${client.client_id}<br>
+                                    <strong>Redirect URI:</strong> ${client.redirect_uri}<br>
+                                    <strong>Description:</strong> ${client.description ? client.description : 'No description available'}
+                                </p>
+                            </div>
+                            <div class="card-footer text-center">
+                                <a href="/clients/${client.client_id}" class="btn btn-primary">Manage</a>
+                            </div>
+                        </div>
+                        `;
+                            clientsContainer.appendChild(card);
+                        });
+                    } else {
+                        // Show the "no clients" message if there are no clients
+                        noClientsMessage.classList.remove('d-none');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching clients:', error);
+                    // You could display an error message to the user here if necessary
+                });
+        });
+    </script>
+{% endblock %}
