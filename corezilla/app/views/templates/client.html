@@ -34,7 +34,8 @@
             // Fetch OAuth clients via AJAX
             fetch('/api/clients')
                 .then(response => response.json())
-                .then(data => {
+                .then(
+                    data => {
                     const clientsContainer = document.getElementById('clients-container');
                     const loadingIndicator = document.getElementById('loading');
                     const noClientsMessage = document.getElementById('no-clients');

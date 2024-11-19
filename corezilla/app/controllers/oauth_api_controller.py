@@ -77,8 +77,6 @@ class AuthorizationApi(MethodView):
         if not redirect_uri:
             return handle_error(redirect_uri, "invalid_request", "The request is missing the 'redirect_uri' parameter.")
 
-
-
         # If all checks pass, return authorization successful
         return {"message": "Authorization successful", "additional_params": additional_params}, http.HTTPStatus.FOUND
 
@@ -102,10 +100,6 @@ class TokenApi(MethodView):
     @oauth_api.response(http.HTTPStatus.OK, TokenResponseSchema)
     @oauth_api.alt_response(status_code=http.HTTPStatus.BAD_REQUEST, schema=ErrorSchema, success=False)
     def post(self, args):
-
-
-
-
         if not current_user.is_authenticated:
             return {
                 "code": http.HTTPStatus.UNAUTHORIZED,

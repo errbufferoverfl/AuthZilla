@@ -28,9 +28,9 @@ class ClientMetadata(db.Model):
         - "description" (str): A brief description of the application.
         - "logo" (str): The URL path to the application’s logo image.
         - "tos" (str): The URL to the application’s Terms of Service (TOS).
-        - "privacy policy" (str): The URL to the application’s Privacy Policy.
-        - "security contact" (str): The email address for security-related inquiries.
-        - "privacy contact" (str): The email address for privacy-related inquiries.
+        - "privacy_policy" (str): The URL to the application’s Privacy Policy.
+        - "security_contact" (str): The email address for security-related inquiries.
+        - "privacy_contact" (str): The email address for privacy-related inquiries.
 
     Example:
         The `metadata_blob` JSON may look like the following:
@@ -39,9 +39,9 @@ class ClientMetadata(db.Model):
             "description": "A sample app providing example services",
             "logo": "/images/sample_logo.png",
             "tos": "https://example.com/terms",
-            "privacy policy": "https://example.com/privacy",
-            "security contact": "security@example.com",
-            "privacy contact": "privacy@example.com"
+            "privacy_policy": "https://example.com/privacy",
+            "security_contact": "security@example.com",
+            "privacy_contact": "privacy@example.com"
         }
         ```
 

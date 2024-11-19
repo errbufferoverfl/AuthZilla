@@ -180,7 +180,7 @@
 {% block js_footer %}
     <script>
         let clientId;
-        let clientLink;
+        let clientLink = "";
 
         // Initial client retrieval or creation on page load
         document.addEventListener("DOMContentLoaded", function () {
@@ -243,7 +243,7 @@
                         document.getElementById('name').value = data.client.name;
                         document.getElementById('client_secret').value = data.client.client_secret;
                         document.getElementById('description').value = data.client.metadata?.description || '';
-                        document.getElementById('logoPreview').src = data.client.metadata?.logo_uri;
+                        document.getElementById('logoPreview').src = data.client.metadata?.logo_uri || '';
                         document.getElementById('app_type').value = ['native', 'spa', 'regular_web', 'm2m'].includes(data.client.client_type) ? data.client.client_type : 'regular_web';
                         // Application URIs
                         document.getElementById('login_uri').value = data.client.configuration?.uris?.app_login_uri || '';
@@ -317,11 +317,11 @@
 
             const formData = {
                 name: document.getElementById('name').value,
-                metadata_blob: {
+                metadata: {
                     description: document.getElementById('description').value,
                     logo_uri: document.getElementById('logo').value
                 },
-                configuration_blob: {
+                configuration: {
                     uris: {
                         app_login_uri: document.getElementById('login_uri').value,
                         redirect_uris: redirectUris,
