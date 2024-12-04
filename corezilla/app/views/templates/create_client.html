@@ -3,202 +3,202 @@
 {% block title %}Create OAuth Client{% endblock %}
 
 {% block content %}
-    <div class="container">
-        <h2 class="my-4 text-center">Register a New OAuth Client</h2>
+<div class="container">
+    <h2 class="my-4 text-center">Register a New OAuth Client</h2>
 
-        <form id="clientForm">
-            <!-- Basic Information Section -->
-            <div class="section-header mt-4 mb-2">
-                <h5>Basic Information</h5>
+    <form id="clientForm">
+        <!-- Basic Information Section -->
+        <div class="section-header mt-4 mb-2">
+            <h5>Basic Information</h5>
+        </div>
+        <div class="mb-3">
+            <label for="name" class="form-label">Client Name</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        <div class="mb-3">
+            <label for="client_id" class="form-label">Client ID</label>
+            <div class="input-group">
+                <input type="text" class="form-control" id="client_id" name="client_id" readonly>
+                <button class="btn btn-outline-secondary" type="button" id="copyButton">Copy</button>
             </div>
-            <div class="mb-3">
-                <label for="name" class="form-label">Client Name</label>
-                <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        <div class="mb-3">
+            <label for="client_secret" class="form-label">Client Secret</label>
+            <div class="input-group">
+                <input type="password" class="form-control" id="client_secret" name="client_secret" readonly>
+                <button class="btn btn-outline-secondary" type="button" id="toggleSecretButton">Show</button>
+                <button class="btn btn-outline-secondary" type="button" id="copySecretButton">Copy</button>
             </div>
-            <div class="mb-3">
-                <label for="client_id" class="form-label">Client ID</label>
-                <div class="input-group">
-                    <input type="text" class="form-control" id="client_id" name="client_id" readonly>
-                    <button class="btn btn-outline-secondary" type="button" id="copyButton">Copy</button>
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="3" maxlength="250" placeholder="Add a description in less than 250 characters."></textarea>
+        </div>
+
+        <!-- Application Properties Section -->
+        <div class="section-header mt-4 mb-2">
+            <h5>Application Properties</h5>
+        </div>
+        <div class="mb-3">
+            <label for="logo" class="form-label">Logo</label>
+            <div class="mb-2">
+                <img id="logoPreview" src="/static/imgs/default_logo.png" alt="Logo Preview" style="max-height: 100px; max-width: 100px;">
+            </div>
+            <input type="file" class="form-control" id="logo" name="logo" accept="image/*">
+        </div>
+        <div class="mb-3">
+            <label for="app_type" class="form-label">Application Type</label>
+            <select id="app_type" name="app_type" class="form-control" required>
+                <option value="native">Native: Mobile, desktop, CLI</option>
+                <option value="spa">Single Page Web Application</option>
+                <option value="regular_web">Regular Web Application</option>
+                <option value="m2m">Machine to Machine Application</option>
+            </select>
+        </div>
+
+        <!-- Application URIs Section -->
+        <div class="section-header mt-4 mb-2">
+            <h5>Application URIs</h5>
+        </div>
+        <div class="mb-3">
+            <label for="login_uri" class="form-label">App Login URI</label>
+            <input type="url" class="form-control" id="login_uri" name="login_uri">
+        </div>
+        <div class="mb-3">
+            <label for="redirect_uris" class="form-label">Redirect URIs</label>
+            <div id="redirect-uris-container">
+                <div class="input-group mb-2 redirect-uri-group">
+                    <input type="url" class="form-control" name="redirect_uris[]" required>
+                    <button type="button" class="btn btn-outline-danger remove-redirect-uri">Delete</button>
                 </div>
             </div>
-            <div class="mb-3">
-                <label for="client_secret" class="form-label">Client Secret</label>
-                <div class="input-group">
-                    <input type="password" class="form-control" id="client_secret" name="client_secret" readonly>
-                    <button class="btn btn-outline-secondary" type="button" id="toggleSecretButton">Show</button>
-                    <button class="btn btn-outline-secondary" type="button" id="copySecretButton">Copy</button>
-                </div>
-            </div>
-            <div class="mb-3">
-                <label for="description" class="form-label">Description</label>
-                <textarea class="form-control" id="description" name="description" rows="3" maxlength="250" placeholder="Add a description in less than 250 characters."></textarea>
-            </div>
+            <button type="button" id="add-redirect-uri" class="btn btn-outline-primary mt-2">+</button>
+            <small class="form-text text-muted">You can add up to 20 redirect URIs.</small>
+        </div>
+        <div class="mb-3">
+            <label for="logout_uris" class="form-label">Allowed Logout URIs</label>
+            <input type="text" class="form-control" id="logout_uris" name="logout_uris">
+        </div>
+        <div class="mb-3">
+            <label for="web_origins" class="form-label">Allowed Web Origins</label>
+            <input type="text" class="form-control" id="web_origins" name="web_origins">
+        </div>
 
-            <!-- Application Properties Section -->
-            <div class="section-header mt-4 mb-2">
-                <h5>Application Properties</h5>
-            </div>
-            <div class="mb-3">
-                <label for="logo" class="form-label">Logo</label>
-                <div class="mb-2">
-                    <img id="logoPreview" src="/static/imgs/default_logo.png" alt="Logo Preview" style="max-height: 100px; max-width: 100px;">
-                </div>
-                <input type="file" class="form-control" id="logo" name="logo" accept="image/*">
-            </div>
-            <div class="mb-3">
-                <label for="app_type" class="form-label">Application Type</label>
-                <select id="app_type" name="app_type" class="form-control" required>
-                    <option value="native">Native: Mobile, desktop, CLI</option>
-                    <option value="spa">Single Page Web Application</option>
-                    <option value="regular_web">Regular Web Application</option>
-                    <option value="m2m">Machine to Machine Application</option>
-                </select>
-            </div>
+        <!-- Cross-Origin Authentication Section -->
+        <div class="section-header mt-4 mb-2">
+            <h5>Cross-Origin Authentication</h5>
+        </div>
+        <div class="mb-3">
+            <label for="cors_enabled" class="form-label">Cross-Origin Authentication Enabled?</label>
+            <select id="cors_enabled" name="cors_enabled" class="form-control">
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="allowed_origins" class="form-label">Allowed Origins (CORS)</label>
+            <input type="text" class="form-control" id="allowed_origins" name="allowed_origins">
+        </div>
+        <div class="mb-3">
+            <label for="cors_fallback" class="form-label">CORS Fallback URI</label>
+            <input type="url" class="form-control" id="cors_fallback" name="cors_fallback">
+        </div>
 
-            <!-- Application URIs Section -->
-            <div class="section-header mt-4 mb-2">
-                <h5>Application URIs</h5>
-            </div>
-            <div class="mb-3">
-                <label for="login_uri" class="form-label">App Login URI</label>
-                <input type="url" class="form-control" id="login_uri" name="login_uri">
-            </div>
-            <div class="mb-3">
-                <label for="redirect_uris" class="form-label">Redirect URIs</label>
-                <div id="redirect-uris-container">
-                    <div class="input-group mb-2 redirect-uri-group">
-                        <input type="url" class="form-control" name="redirect_uris[]" required>
-                        <button type="button" class="btn btn-outline-danger remove-redirect-uri">Delete</button>
-                    </div>
-                </div>
-                <button type="button" id="add-redirect-uri" class="btn btn-outline-primary mt-2">+</button>
-                <small class="form-text text-muted">You can add up to 20 redirect URIs.</small>
-            </div>
-            <div class="mb-3">
-                <label for="logout_uris" class="form-label">Allowed Logout URIs</label>
-                <input type="text" class="form-control" id="logout_uris" name="logout_uris">
-            </div>
-            <div class="mb-3">
-                <label for="web_origins" class="form-label">Allowed Web Origins</label>
-                <input type="text" class="form-control" id="web_origins" name="web_origins">
-            </div>
+        <!-- Refresh Token Settings Section -->
+        <div class="section-header mt-4 mb-2">
+            <h5>Refresh Token Expiration</h5>
+        </div>
+        <div class="mb-3">
+            <label for="idle_lifetime" class="form-label">Idle Refresh Token Lifetime</label>
+            <input type="number" class="form-control" id="idle_lifetime" name="idle_lifetime" value="1296000">
+        </div>
+        <div class="mb-3">
+            <label for="lifetime" class="form-label">Refresh Token Lifetime</label>
+            <input type="number" class="form-control" id="lifetime" name="lifetime">
+        </div>
+        <div class="mb-3">
+            <label for="max_lifetime" class="form-label">Maximum Refresh Token Lifetime</label>
+            <input type="number" class="form-control" id="max_lifetime" name="max_lifetime" value="2592000">
+        </div>
 
-            <!-- Cross-Origin Authentication Section -->
-            <div class="section-header mt-4 mb-2">
-                <h5>Cross-Origin Authentication</h5>
-            </div>
-            <div class="mb-3">
-                <label for="cors_enabled" class="form-label">Cross-Origin Authentication Enabled?</label>
-                <select id="cors_enabled" name="cors_enabled" class="form-control">
-                    <option value="true">Yes</option>
-                    <option value="false">No</option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label for="allowed_origins" class="form-label">Allowed Origins (CORS)</label>
-                <input type="text" class="form-control" id="allowed_origins" name="allowed_origins">
-            </div>
-            <div class="mb-3">
-                <label for="cors_fallback" class="form-label">CORS Fallback URI</label>
-                <input type="url" class="form-control" id="cors_fallback" name="cors_fallback">
-            </div>
+        <!-- Token Sender Constraining -->
+        <div class="section-header mt-4 mb-2">
+            <h5>Token Sender Constraining</h5>
+        </div>
+        <div class="mb-3">
+            <label for="sender_constraining" class="form-label">Enable Token Sender Constraining</label>
+            <select id="sender_constraining" name="sender_constraining" class="form-control">
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+            </select>
+        </div>
 
-            <!-- Refresh Token Settings Section -->
-            <div class="section-header mt-4 mb-2">
-                <h5>Refresh Token Expiration</h5>
-            </div>
-            <div class="mb-3">
-                <label for="idle_lifetime" class="form-label">Idle Refresh Token Lifetime</label>
-                <input type="number" class="form-control" id="idle_lifetime" name="idle_lifetime" value="1296000">
-            </div>
-            <div class="mb-3">
-                <label for="lifetime" class="form-label">Refresh Token Lifetime</label>
-                <input type="number" class="form-control" id="lifetime" name="lifetime">
-            </div>
-            <div class="mb-3">
-                <label for="max_lifetime" class="form-label">Maximum Refresh Token Lifetime</label>
-                <input type="number" class="form-control" id="max_lifetime" name="max_lifetime" value="2592000">
-            </div>
+        <!-- Advanced Settings -->
+        <div class="section-header mt-4 mb-2">
+            <h5>Advanced Settings</h5>
+        </div>
+        <div class="mb-3">
+            <label for="jwt_algorithm" class="form-label">JWT Signature Algorithm</label>
+            <select id="jwt_algorithm" name="jwt_algorithm" class="form-control" disabled>
+                <option value="RS256">RS256</option>
+                <option value="HS256">HS256</option>
+                <option value="PS256">PS256</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="oidc_conformant" class="form-label">OIDC Conformant</label>
+            <select id="oidc_conformant" name="oidc_conformant" class="form-control" disabled>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+            </select>
+        </div>
 
-            <!-- Token Sender Constraining -->
-            <div class="section-header mt-4 mb-2">
-                <h5>Token Sender Constraining</h5>
-            </div>
-            <div class="mb-3">
-                <label for="sender_constraining" class="form-label">Enable Token Sender Constraining</label>
-                <select id="sender_constraining" name="sender_constraining" class="form-control">
-                    <option value="true">Yes</option>
-                    <option value="false">No</option>
-                </select>
-            </div>
+        <!-- Application Authentication Section -->
+        <div id="auth_method_section" class="section-header mt-4 mb-2" style="display: none;">
+            <h5>Application Authentication</h5>
+        </div>
+        <div id="auth_method_fields" class="mb-3" style="display: none;">
+            <label for="auth_method" class="form-label">Authentication Method</label>
+            <select id="auth_method" name="auth_method" class="form-control">
+                <option value="mtls_ca">mTLS (CA-Signed)</option>
+                <option value="mtls_self">mTLS (Self-Signed)</option>
+                <option value="private_key_jwt">Private Key JWT</option>
+                <option value="client_secret_post">Client Secret (Post)</option>
+                <option value="client_secret_basic">Client Secret (Basic)</option>
+                <option value="none">None</option>
+            </select>
+        </div>
 
-            <!-- Advanced Settings -->
-            <div class="section-header mt-4 mb-2">
-                <h5>Advanced Settings</h5>
-            </div>
-            <div class="mb-3">
-                <label for="jwt_algorithm" class="form-label">JWT Signature Algorithm</label>
-                <select id="jwt_algorithm" name="jwt_algorithm" class="form-control" disabled>
-                    <option value="RS256">RS256</option>
-                    <option value="HS256">HS256</option>
-                    <option value="PS256">PS256</option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label for="oidc_conformant" class="form-label">OIDC Conformant</label>
-                <select id="oidc_conformant" name="oidc_conformant" class="form-control" disabled>
-                    <option value="true">Yes</option>
-                    <option value="false">No</option>
-                </select>
-            </div>
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+    </form>
 
-            <!-- Application Authentication Section -->
-            <div id="auth_method_section" class="section-header mt-4 mb-2" style="display: none;">
-                <h5>Application Authentication</h5>
-            </div>
-            <div id="auth_method_fields" class="mb-3" style="display: none;">
-                <label for="auth_method" class="form-label">Authentication Method</label>
-                <select id="auth_method" name="auth_method" class="form-control">
-                    <option value="mtls_ca">mTLS (CA-Signed)</option>
-                    <option value="mtls_self">mTLS (Self-Signed)</option>
-                    <option value="private_key_jwt">Private Key JWT</option>
-                    <option value="client_secret_post">Client Secret (Post)</option>
-                    <option value="client_secret_basic">Client Secret (Basic)</option>
-                    <option value="none">None</option>
-                </select>
-            </div>
-
-            <!-- Submit Button -->
-            <button type="submit" class="btn btn-primary">Save Changes</button>
-        </form>
-
-        <!-- Success or error messages -->
-        <div id="responseMessage" class="mt-3"></div>
-    </div>
+    <!-- Success or error messages -->
+    <div id="responseMessage" class="mt-3"></div>
+</div>
 {% endblock %}
 {% block js_footer %}
-    <script>
-        let clientId;
-        let clientLink = "";
+<script>
+    let clientId;
+    let clientLink = "";
 
-        // Initial client retrieval or creation on page load
-        document.addEventListener("DOMContentLoaded", function () {
-            clientLink = sessionStorage.getItem("clientLink");
-            if (!clientLink) { // If clientLink is undefined, immediately create a new client
-                createNewClient();
-                return;
-            }
+    // Initial client retrieval or creation on page load
+    document.addEventListener("DOMContentLoaded", function () {
+        clientLink = sessionStorage.getItem("clientLink");
+        if (!clientLink) { // If clientLink is undefined, immediately create a new client
+            createNewClient();
+            return;
+        }
 
-            fetch(clientLink, {
-                method: 'GET',
-                headers: {'Content-Type': 'application/json'}
-            })
+        fetch(clientLink, {
+            method: 'GET',
+            headers: {'Content-Type': 'application/json'}
+        })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.client) {
+                    if (data) {
                         // Load existing client data if available
-                        loadClientData(data.client);
+                        loadClientData(data);
                     } else {
                         // If no client exists, create a new one
                         createNewClient();
@@ -208,167 +208,168 @@
                     document.getElementById('responseMessage').innerHTML = `
                     <div class="alert alert-danger">Error loading client: ${error.message}</div>`;
                 });
-        });
+    });
 
-        function loadClientData(client) {
-            clientId = client.client_id;
-            document.getElementById('client_id').value = clientId;
-            document.getElementById('name').value = client.name;
-            document.getElementById('client_secret').value = client.client_secret;
-            document.getElementById('description').value = client.metadata?.description;
-            document.getElementById('logoPreview').src = client.metadata?.logo_uri;
-            document.getElementById('app_type').value = client.client_type;
+    function loadClientData(client) {
+        clientId = client.client_id;
+        document.getElementById('client_id').value = clientId;
+        document.getElementById('name').value = client.name;
+        document.getElementById('client_secret').value = client.client_secret;
+        document.getElementById('description').value = client.metadata?.description;
+        document.getElementById('logoPreview').src = client.metadata?.logo_uri;
+        document.getElementById('app_type').value = client.client_type;
 
-            // Populate other fields as required by your data structure
-            // Example for Application URIs:
-            document.getElementById('login_uri').value = client.configuration?.uris?.app_login_uri;
-            client.configuration?.uris?.redirect_uris?.forEach(uri => addRedirectUri(uri));
-            document.getElementById('logout_uris').value = client.configuration?.uris?.logout_uris.join(', ');
-            document.getElementById('web_origins').value = client.configuration?.uris?.web_origins.join(', ');
-        }
+        // Populate other fields as required by your data structure
+        // Example for Application URIs:
+        document.getElementById('login_uri').value = client.configuration?.uris?.app_login_uri;
+        client.configuration?.uris?.redirect_uris?.forEach(uri => addRedirectUri(uri));
+        document.getElementById('logout_uris').value = client.configuration?.uris?.logout_uris.join(', ');
+        document.getElementById('web_origins').value = client.configuration?.uris?.web_origins.join(', ');
+    }
 
-        function createNewClient() {
-            fetch('/api/clients/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
+    function createNewClient() {
+        fetch('/api/clients/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.client) {
-                        sessionStorage.setItem("clientLink", data.client._links.self);
-                        clientId = data.client.client_id;
+                    if (data) {
+                        sessionStorage.setItem("clientLink", data._links.self);
+                        clientId = data_id;
+
                         document.getElementById('client_id').value = clientId;
-                        document.getElementById('name').value = data.client.name;
-                        document.getElementById('client_secret').value = data.client.client_secret;
-                        document.getElementById('description').value = data.client.metadata?.description || '';
-                        document.getElementById('logoPreview').src = data.client.metadata?.logo_uri || '';
-                        document.getElementById('app_type').value = ['native', 'spa', 'regular_web', 'm2m'].includes(data.client.client_type) ? data.client.client_type : 'regular_web';
+                        document.getElementById('name').value = data.name;
+                        document.getElementById('client_secret').value = data_secret;
+                        document.getElementById('description').value = data.metadata?.description || '';
+                        document.getElementById('logoPreview').src = data.metadata?.logo_uri || '';
+                        document.getElementById('app_type').value = ['native', 'spa', 'regular_web', 'm2m'].includes(data_type) ? data_type : 'regular_web';
                         // Application URIs
-                        document.getElementById('login_uri').value = data.client.configuration?.uris?.app_login_uri || '';
-                        data.client.configuration?.uris?.redirect_uris?.forEach(uri => addRedirectUri(uri));
-                        document.getElementById('logout_uris').value = data.client.configuration?.uris?.logout_uris.join(', ') || '';
-                        document.getElementById('web_origins').value = data.client.configuration?.uris?.web_origins.join(', ') || '';
+                        document.getElementById('login_uri').value = data.configuration?.uris?.app_login_uri || '';
+                        data.configuration?.uris?.redirect_uris?.forEach(uri => addRedirectUri(uri));
+                        document.getElementById('logout_uris').value = data.configuration?.uris?.logout_uris.join(', ') || '';
+                        document.getElementById('web_origins').value = data.configuration?.uris?.web_origins.join(', ') || '';
 
                         // CORS Settings
-                        document.getElementById('cors_enabled').value = data.client.configuration?.cors?.is_enabled ? 'true' : 'false';
-                        document.getElementById('allowed_origins').value = data.client.configuration?.cors?.allowed_origins.join(', ') || '';
-                        document.getElementById('cors_fallback').value = data.client.configuration?.cors?.fallback_url || '';
+                        document.getElementById('cors_enabled').value = data.configuration?.cors?.is_enabled ? 'true' : 'false';
+                        document.getElementById('allowed_origins').value = data.configuration?.cors?.allowed_origins.join(', ') || '';
+                        document.getElementById('cors_fallback').value = data.configuration?.cors?.fallback_url || '';
 
                         // Refresh Token Settings
-                        document.getElementById('idle_lifetime').value = data.client.configuration?.refresh?.idle_refresh_token_lifetime || '1296000';
-                        document.getElementById('lifetime').value = data.client.configuration?.refresh?.rotation_overlap_period || '';
-                        document.getElementById('max_lifetime').value = data.client.configuration?.refresh?.maximum_refresh_token_lifetime || '2592000';
+                        document.getElementById('idle_lifetime').value = data.configuration?.refresh?.idle_refresh_token_lifetime || '1296000';
+                        document.getElementById('lifetime').value = data.configuration?.refresh?.rotation_overlap_period || '';
+                        document.getElementById('max_lifetime').value = data.configuration?.refresh?.maximum_refresh_token_lifetime || '2592000';
 
                         // Advanced Settings
-                        document.getElementById('jwt_algorithm').value = data.client.configuration?.jwt?.algorithm || 'RS256';
-                        document.getElementById('oidc_conformant').value = data.client.configuration?.oidc_conformant ? 'true' : 'false';
-                        document.getElementById('auth_method').value = data.client.configuration?.token_endpoint_auth_method || 'none';
+                        document.getElementById('jwt_algorithm').value = data.configuration?.jwt?.algorithm || 'RS256';
+                        document.getElementById('oidc_conformant').value = data.configuration?.oidc_conformant ? 'true' : 'false';
+                        document.getElementById('auth_method').value = data.configuration?.token_endpoint_auth_method || 'none';
                     }
                 })
                 .catch(error => {
                     document.getElementById('responseMessage').innerHTML = `
                 <div class="alert alert-danger">Error creating client: ${error.message}</div>`;
                 });
+    }
+
+    // Toggle visibility of client secret
+    document.getElementById('toggleSecretButton').addEventListener('click', function () {
+        const clientSecretInput = document.getElementById('client_secret');
+        if (clientSecretInput.type === "password") {
+            clientSecretInput.type = "text";
+            this.textContent = "Hide";
+        } else {
+            clientSecretInput.type = "password";
+            this.textContent = "Show";
         }
+    });
 
-        // Toggle visibility of client secret
-        document.getElementById('toggleSecretButton').addEventListener('click', function () {
-            const clientSecretInput = document.getElementById('client_secret');
-            if (clientSecretInput.type === "password") {
-                clientSecretInput.type = "text";
-                this.textContent = "Hide";
-            } else {
-                clientSecretInput.type = "password";
-                this.textContent = "Show";
-            }
-        });
+    // Copy client secret to clipboard
+    document.getElementById('copySecretButton').addEventListener('click', function () {
+        const clientSecretInput = document.getElementById('client_secret');
+        clientSecretInput.select();
+        document.execCommand('copy');
+        this.textContent = 'Copied!';
+        setTimeout(() => {
+            this.textContent = 'Copy';
+        }, 2000);
+    });
 
-        // Copy client secret to clipboard
-        document.getElementById('copySecretButton').addEventListener('click', function () {
-            const clientSecretInput = document.getElementById('client_secret');
-            clientSecretInput.select();
-            document.execCommand('copy');
-            this.textContent = 'Copied!';
-            setTimeout(() => {
-                this.textContent = 'Copy';
-            }, 2000);
-        });
-
-        // Function to add new redirect URI inputs
-        function addRedirectUri(uri) {
-            const container = document.getElementById('redirect-uris-container');
-            const newRedirectUriGroup = document.createElement('div');
-            newRedirectUriGroup.className = 'input-group mb-2 redirect-uri-group';
-            newRedirectUriGroup.innerHTML = `
+    // Function to add new redirect URI inputs
+    function addRedirectUri(uri) {
+        const container = document.getElementById('redirect-uris-container');
+        const newRedirectUriGroup = document.createElement('div');
+        newRedirectUriGroup.className = 'input-group mb-2 redirect-uri-group';
+        newRedirectUriGroup.innerHTML = `
             <input type="url" class="form-control" name="redirect_uris[]" value="${uri || ''}" required>
             <button type="button" class="btn btn-outline-danger remove-redirect-uri">Delete</button>
         `;
-            container.appendChild(newRedirectUriGroup);
-        }
+        container.appendChild(newRedirectUriGroup);
+    }
 
-        // Handle form submission for updating the client
-        document.getElementById('clientForm').addEventListener('submit', function (event) {
-            event.preventDefault();
+    // Handle form submission for updating the client
+    document.getElementById('clientForm').addEventListener('submit', function (event) {
+        event.preventDefault();
 
-            const redirectUris = Array.from(document.querySelectorAll('[name="redirect_uris[]"]'))
+        const redirectUris = Array.from(document.querySelectorAll('[name="redirect_uris[]"]'))
                 .map(input => input.value);
 
-            const formData = {
-                name: document.getElementById('name').value,
-                metadata: {
-                    description: document.getElementById('description').value,
-                    logo_uri: document.getElementById('logo').value
+        const formData = {
+            name: document.getElementById('name').value,
+            metadata: {
+                description: document.getElementById('description').value,
+                logo_uri: document.getElementById('logo').value
+            },
+            configuration: {
+                uris: {
+                    app_login_uri: document.getElementById('login_uri').value,
+                    redirect_uris: redirectUris,
+                    logout_uris: document.getElementById('logout_uris').value.split(',').map(uri => uri.trim()),
+                    web_origins: document.getElementById('web_origins').value.split(',').map(origin => origin.trim())
                 },
-                configuration: {
-                    uris: {
-                        app_login_uri: document.getElementById('login_uri').value,
-                        redirect_uris: redirectUris,
-                        logout_uris: document.getElementById('logout_uris').value.split(',').map(uri => uri.trim()),
-                        web_origins: document.getElementById('web_origins').value.split(',').map(origin => origin.trim())
-                    },
-                    cors: {
-                        is_enabled: document.getElementById('cors_enabled').value === 'true',
-                        allowed_origins: document.getElementById('allowed_origins').value.split(',').map(origin => origin.trim()),
-                        fallback_url: document.getElementById('cors_fallback').value
-                    },
-                    refresh: {
-                        idle_refresh_token_lifetime: parseInt(document.getElementById('idle_lifetime').value, 10),
-                        rotation_overlap_period: parseInt(document.getElementById('lifetime').value, 10),
-                        maximum_refresh_token_lifetime: parseInt(document.getElementById('max_lifetime').value, 10)
-                    },
-                    jwt: {
-                        algorithm: document.getElementById('jwt_algorithm').value
-                    },
-                    token_endpoint_auth_method: document.getElementById('auth_method').value,
-                    oidc_conformant: document.getElementById('oidc_conformant').value === 'true',
-                    sender_constrained: document.getElementById('sender_constraining').value === 'true'
-                }
-            };
+                cors: {
+                    is_enabled: document.getElementById('cors_enabled').value === 'true',
+                    allowed_origins: document.getElementById('allowed_origins').value.split(',').map(origin => origin.trim()),
+                    fallback_url: document.getElementById('cors_fallback').value
+                },
+                refresh: {
+                    idle_refresh_token_lifetime: parseInt(document.getElementById('idle_lifetime').value, 10),
+                    rotation_overlap_period: parseInt(document.getElementById('lifetime').value, 10),
+                    maximum_refresh_token_lifetime: parseInt(document.getElementById('max_lifetime').value, 10)
+                },
+                jwt: {
+                    algorithm: document.getElementById('jwt_algorithm').value
+                },
+                token_endpoint_auth_method: document.getElementById('auth_method').value,
+                oidc_conformant: document.getElementById('oidc_conformant').value === 'true',
+                sender_constrained: document.getElementById('sender_constraining').value === 'true'
+            }
+        };
 
-            fetch(clientLink, {
-                method: 'PATCH',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(formData)
-            })
+        fetch(clientLink, {
+            method: 'PATCH',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(formData)
+        })
                 .then(response => response.json())
                 .then(data => {
                     const responseMessageDiv = document.getElementById('responseMessage');
-                    if (data.client) {
+                    if (data) {
                         responseMessageDiv.innerHTML = `
                     <div class="alert alert-success" role="alert">Client updated successfully</div>`;
                     } else {
                         responseMessageDiv.innerHTML = `
-                    <div class="alert alert-danger" role="alert">${data.client.message || 'An error occurred'}</div>`;
+                    <div class="alert alert-danger" role="alert">${data.message || 'An error occurred'}</div>`;
                     }
                 })
                 .catch(error => {
                     document.getElementById('responseMessage').innerHTML = `
                 <div class="alert alert-danger" role="alert">Error: ${error.message}</div>`;
                 });
-        });
+    });
 
-        // Additional event listeners...
-    </script>
+    // Additional event listeners...
+</script>
 {% endblock %}

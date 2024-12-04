@@ -1,9 +1,11 @@
 import http
+import logging
 
 from flask.views import MethodView
 from flask_login import login_required, current_user
 from flask_smorest import Blueprint
 from flask_smorest.error_handler import ErrorSchema
+from sqlalchemy.exc import SQLAlchemyError
 
 from corezilla.app import db
 from corezilla.app.models.Client import Client, ClientMetadata, ClientConfiguration
@@ -185,7 +187,7 @@ class ClientsAPI(MethodView):
 
         return response, http.HTTPStatus.OK
 
-    @client_api.arguments(CreateClientResponseSchema, location="json", content_type="application/json")
+    @client_api.arguments(CreateClientRequest, location="json", content_type="application/json")
     @client_api.response(status_code=http.HTTPStatus.CREATED, schema=CreateClientResponseSchema, example={
             "client": {
                 "client_id": "cl-ab12cd34ef56gh78",
@@ -324,7 +326,7 @@ class ClientsAPI(MethodView):
 
 @client_api.route("/<client_id>")
 class ClientAPI(MethodView):
-    @client_api.response(status_code=http.HTTPStatus.OK, schema=GetClientResponseSchema)
+    @client_api.response(status_code=http.HTTPStatus.OK, schema=CreateClientResponseSchema)
     @client_api.alt_response(status_code=http.HTTPStatus.UNAUTHORIZED, schema=ErrorSchema, success=False)
     @client_api.alt_response(status_code=http.HTTPStatus.BAD_REQUEST, schema=ErrorSchema, success=False)
     @client_api.alt_response(status_code=http.HTTPStatus.UNPROCESSABLE_ENTITY, schema=ErrorSchema, success=False)
@@ -357,13 +359,13 @@ class ClientAPI(MethodView):
             "client_type": client.app_type,
             "client_uri": client.client_uri,
 
-            "metadata_blob": client.client_metadata.metadata_blob,
-            "configuration_blob": client.client_configurations[0].configuration_blob
+            "metadata": client.client_metadata.metadata_blob,
+            "configuration": client.client_configurations[0].configuration_blob
         }
 
-        client_response_data = GetClientResponseSchema().dump({"client": client_data})
+        response = CreateClientResponseSchema().dump(client_data)
 
-        return client_response_data
+        return response
 
     @client_api.arguments(UpdateClientRequest, location="json", content_type="application/json")
     @client_api.response(status_code=http.HTTPStatus.OK, schema=CreateClientResponseSchema)
@@ -396,14 +398,25 @@ class ClientAPI(MethodView):
 
         # Replace all fields with new data
         client.client_name = args.get("name", client.client_name)
+        client.client_uri = args.get("uri", client.client_uri)
+
+        # TODO: Add in support for changing visibility
+
+        client.app_type = args.get("type", client.app_type)
+
         client_metadata.metadata_blob = args["metadata_blob"]
         client_configuration.configuration_blob = args["configuration_blob"]
 
-        db.session.commit()
+        try:
+            db.session.commit()
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            logging.error("Database commit failed. Rolling back the session.", exc_info=True)
+            raise Exception("An error occurred while committing to the database. Please try again later.") from e
 
-        client_response_data = GetClientResponseSchema().dump({"client": client})
+        response = CreateClientResponseSchema().dump(client)
 
-        return client_response_data
+        return response
 
     @client_api.arguments(UpdateClientRequest, location="json", content_type="application/json")
     @client_api.response(status_code=http.HTTPStatus.OK, schema=CreateClientResponseSchema)

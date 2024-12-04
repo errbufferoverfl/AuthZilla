@@ -1,35 +1,66 @@
 from marshmallow import Schema, fields, post_dump
 
 from corezilla.app.schemas.create_client_request_schema import (
-    URIsSchema, CORSConfigSchema, RefreshTokenSettingsSchema, JWTSettingsSchema
+    RefreshTokenSettingsSchema, JWTSettingsSchema
 )
+
+
+class URIResponseSchema(Schema):
+    app_login_uri = fields.String(
+        description="The URI for the application's login page."
+    )
+    redirect_uris = fields.List(
+        fields.String(),
+        description="List of URIs for redirection after authentication."
+    )
+    logout_uris = fields.List(
+        fields.String(),
+        description="List of URIs for redirection after logout."
+    )
+    web_origins = fields.List(
+        fields.String(),
+        description="List of allowed web origins for CORS requests."
+    )
+
+
+class CORSConfigResponseSchema(Schema):
+    is_enabled = fields.Bool(
+        description="Indicates if Cross-Origin Resource Sharing (CORS) is enabled."
+    )
+    allowed_origins = fields.List(
+        fields.String(),
+        description="List of allowed origins for CORS requests."
+    )
+    fallback_url = fields.String(
+        description="Fallback URL for CORS requests when an origin is not explicitly allowed."
+    )
 
 
 # Metadata schema for client information
 class ClientMetadataResponseSchema(Schema):
-    description = fields.String()
-    logo = fields.String()
-    tos = fields.Url()
-    privacy_policy = fields.Url(data_key="privacy_policy")
-    security_contact = fields.Str(data_key="security_contact")
-    privacy_contact = fields.Str(data_key="privacy_contact")
+    description = fields.String(allow_none=True)
+    logo = fields.String(allow_none=True)
+    tos = fields.String(allow_none=True)
+    privacy_policy = fields.String(data_key="privacy_policy", allow_none=True)
+    security_contact = fields.String(data_key="security_contact", allow_none=True)
+    privacy_contact = fields.String(data_key="privacy_contact", allow_none=True)
 
 
 # Configuration schema for client settings
 class ClientConfigurationResponseSchema(Schema):
     oidc_conformant = fields.Bool()
     sender_constrained = fields.Bool()
-    token_endpoint_auth_method = fields.String()
-    uris = fields.Nested(URIsSchema())
-    cors = fields.Nested(CORSConfigSchema())
+    token_endpoint_auth_method = fields.String(allow_none=True)
+    uris = fields.Nested(URIResponseSchema())
+    cors = fields.Nested(CORSConfigResponseSchema())
     refresh = fields.Nested(RefreshTokenSettingsSchema())
     jwt = fields.Nested(JWTSettingsSchema())
 
 
 # Client secret schema with visibility settings
 class ClientSecretSchema(Schema):
-    value = fields.Str(required=True)
-    visibility = fields.Str(required=True, default="private")
+    value = fields.String(required=True)
+    visibility = fields.String(required=True, default="private")
 
 
 # Links schema to add hypermedia controls

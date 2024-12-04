@@ -16,7 +16,7 @@ def home():
 @core_web.route('/dashboard', methods=['GET'])
 @login_required
 def list_client_view():
-    return render_template('client.html')
+    return render_template('clients.html')
 
 
 @core_web.route('/clients/create', methods=['GET'])
@@ -27,7 +27,13 @@ def create_client_view():
     session['client_id'] = client_id  # Store the client_id in the session
 
     # Render the form and pass the client_id
-    return render_template('create_client.html', client_id=client_id)
+    return render_template('get_client.html', client_id=client_id)
+
+
+@core_web.route('/clients/<client_id>', methods=['GET'])
+@login_required
+def get_client_view(client_id):
+    return render_template('get_client.html', client_id=client_id)
 
 
 @core_web.errorhandler(400)

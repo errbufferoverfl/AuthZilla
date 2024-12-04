@@ -165,6 +165,24 @@ class ClientConfiguration(db.Model):
         the new entry to one version higher.
         """
         self.client_id = client_id
+
+        # Define default configuration settings
+        default_configuration = {
+            "oidc_conformant": True,
+            "sender_constrained": False,
+            "token_endpoint_auth_method": "client_secret_basic",
+            "cors": {
+                "is_enabled": False
+            },
+            "jwt": {
+                "algorithm": "RS256"
+            },
+        }
+        # Merge provided configuration with defaults
+        if configuration_blob is None:
+            configuration_blob = {}
+        self.configuration_blob = {**default_configuration, **configuration_blob}
+
         self.configuration_blob = configuration_blob
 
         max_version = db.session.query(db.func.max(ClientConfiguration.version)).filter_by(client_id=client_id).scalar()
