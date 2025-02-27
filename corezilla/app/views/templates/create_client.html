@@ -51,7 +51,7 @@
             <select id="app_type" name="app_type" class="form-control" required>
                 <option value="native">Native: Mobile, desktop, CLI</option>
                 <option value="spa">Single Page Web Application</option>
-                <option value="regular_web">Regular Web Application</option>
+                <option value="web">Regular Web Application</option>
                 <option value="m2m">Machine to Machine Application</option>
             </select>
         </div>
@@ -197,10 +197,8 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data) {
-                        // Load existing client data if available
                         loadClientData(data);
                     } else {
-                        // If no client exists, create a new one
                         createNewClient();
                     }
                 })
@@ -212,19 +210,64 @@
 
     function loadClientData(client) {
         clientId = client.client_id;
+        const clientType = client.client_type;
+
         document.getElementById('client_id').value = clientId;
         document.getElementById('name').value = client.name;
         document.getElementById('client_secret').value = client.client_secret;
         document.getElementById('description').value = client.metadata?.description;
-        document.getElementById('logoPreview').src = client.metadata?.logo_uri;
-        document.getElementById('app_type').value = client.client_type;
+        document.getElementById('logoPreview').src = client.metadata?.logo;
 
-        // Populate other fields as required by your data structure
-        // Example for Application URIs:
+        const appTypeSelect = document.getElementById('app_type');
+        const isValidOption = Array.from(appTypeSelect.options).some(option => option.value === clientType);
+        console.log(isValidOption);
+
+        if (isValidOption) {
+            appTypeSelect.value = clientType;
+        } else {
+            appTypeSelect.value = "";
+        }
+
         document.getElementById('login_uri').value = client.configuration?.uris?.app_login_uri;
         client.configuration?.uris?.redirect_uris?.forEach(uri => addRedirectUri(uri));
+
         document.getElementById('logout_uris').value = client.configuration?.uris?.logout_uris.join(', ');
         document.getElementById('web_origins').value = client.configuration?.uris?.web_origins.join(', ');
+    }
+
+    // Toggle visibility of client secret
+    document.getElementById('toggleSecretButton').addEventListener('click', function () {
+        const clientSecretInput = document.getElementById('client_secret');
+        if (clientSecretInput.type === "password") {
+            clientSecretInput.type = "text";
+            this.textContent = "Hide";
+        } else {
+            clientSecretInput.type = "password";
+            this.textContent = "Show";
+        }
+    });
+
+    // Copy client secret to clipboard
+    document.getElementById('copySecretButton').addEventListener('click', function () {
+        const clientSecretInput = document.getElementById('client_secret');
+        clientSecretInput.select();
+        document.execCommand('copy');
+        this.textContent = 'Copied!';
+        setTimeout(() => {
+            this.textContent = 'Copy';
+        }, 2000);
+    });
+
+    // Function to add new redirect URI inputs
+    function addRedirectUri(uri) {
+        const container = document.getElementById('redirect-uris-container');
+        const newRedirectUriGroup = document.createElement('div');
+        newRedirectUriGroup.className = 'input-group mb-2 redirect-uri-group';
+        newRedirectUriGroup.innerHTML = `
+            <input type="url" class="form-control" name="redirect_uris[]" value="${uri || ''}" required>
+            <button type="button" class="btn btn-outline-danger remove-redirect-uri">Delete</button>
+        `;
+        container.appendChild(newRedirectUriGroup);
     }
 
     function createNewClient() {
@@ -244,7 +287,7 @@
                         document.getElementById('name').value = data.name;
                         document.getElementById('client_secret').value = data_secret;
                         document.getElementById('description').value = data.metadata?.description || '';
-                        document.getElementById('logoPreview').src = data.metadata?.logo_uri || '';
+                        document.getElementById('logoPreview').src = data.metadata?.logo || '';
                         document.getElementById('app_type').value = ['native', 'spa', 'regular_web', 'm2m'].includes(data_type) ? data_type : 'regular_web';
                         // Application URIs
                         document.getElementById('login_uri').value = data.configuration?.uris?.app_login_uri || '';
@@ -297,18 +340,6 @@
         }, 2000);
     });
 
-    // Function to add new redirect URI inputs
-    function addRedirectUri(uri) {
-        const container = document.getElementById('redirect-uris-container');
-        const newRedirectUriGroup = document.createElement('div');
-        newRedirectUriGroup.className = 'input-group mb-2 redirect-uri-group';
-        newRedirectUriGroup.innerHTML = `
-            <input type="url" class="form-control" name="redirect_uris[]" value="${uri || ''}" required>
-            <button type="button" class="btn btn-outline-danger remove-redirect-uri">Delete</button>
-        `;
-        container.appendChild(newRedirectUriGroup);
-    }
-
     // Handle form submission for updating the client
     document.getElementById('clientForm').addEventListener('submit', function (event) {
         event.preventDefault();
@@ -320,7 +351,7 @@
             name: document.getElementById('name').value,
             metadata: {
                 description: document.getElementById('description').value,
-                logo_uri: document.getElementById('logo').value
+                logo: document.getElementById('logo').value
             },
             configuration: {
                 uris: {
@@ -370,6 +401,5 @@
                 });
     });
 
-    // Additional event listeners...
 </script>
 {% endblock %}

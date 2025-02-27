@@ -16,7 +16,6 @@ user_api = Blueprint("user", "user", url_prefix="/api/users", description="User 
 
 @user_api.route("/")
 class UserAPI(MethodView):
-
     @user_api.arguments(UserSessionSchema, as_kwargs=True)
     @user_api.response(http.HTTPStatus.CREATED, schema=UserSchema)
     @user_api.alt_response(http.HTTPStatus.FOUND, schema=UserSchema, success=True)

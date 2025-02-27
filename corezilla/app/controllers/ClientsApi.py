@@ -1,6 +1,7 @@
 import http
 import logging
 
+from flask import request
 from flask.views import MethodView
 from flask_login import login_required, current_user
 from flask_smorest import Blueprint
@@ -426,7 +427,10 @@ class ClientAPI(MethodView):
     @login_required
     def patch(self, args, client_id):
         """Update client configuration"""
+        logging.info(f"PATCH request received. Client ID: {client_id}, Request IP: {request.remote_addr}")
+
         if not client_id:
+            logging.warning(f"Missing required parameter: client_id. Request IP: {request.remote_addr}")
             return {
                 'code': 400,
                 'status': 'Bad Request',
@@ -434,9 +438,10 @@ class ClientAPI(MethodView):
                 'errors': {}
             }, http.HTTPStatus.BAD_REQUEST
 
+        # Fetch client and verify ownership
         client = Client.query.filter_by(client_id=client_id, user_id=current_user.user_id).first()
-
         if not client:
+            logging.warning(f"Client ID {client_id} not found for user ID {current_user.user_id}. Request IP: {request.remote_addr}")
             return {
                 'code': 404,
                 'status': 'Not Found',
@@ -444,24 +449,49 @@ class ClientAPI(MethodView):
                 'errors': {}
             }, http.HTTPStatus.NOT_FOUND
 
-        client_metadata = ClientMetadata.query.filter_by(client_id=client_id).first_or_404()
-        client_configuration = ClientConfiguration.query.filter_by(client_id=client_id).first_or_404()
+        # Log successful retrieval of the client
+        logging.info(f"Client ID {client_id} found for user ID {current_user.user_id}. Proceeding with update.")
 
-        # Update only provided fields
-        if "name" in args:
-            client.client_name = args.get("name")
+        try:
+            client_metadata = ClientMetadata.query.filter_by(client_id=client_id).first_or_404()
+            client_configuration = ClientConfiguration.query.filter_by(client_id=client_id).first_or_404()
 
-        if "metadata_blob" in args:
-            client_metadata.metadata_blob.update(args.get("metadata_blob"))
+            # Update only provided fields
+            if "name" in args:
+                old_name = client.client_name
+                new_name = args.get("name")
+                client.client_name = new_name
+                logging.info(f"Updated client name for client ID {client_id} from '{old_name}' to '{new_name}'")
 
-        if "configuration_blob" in args:
-            client_configuration.configuration_blob.update(args.get("configuration_blob"))
+            if "metadata_blob" in args:
+                old_metadata = client_metadata.metadata_blob
+                new_metadata = args.get("metadata_blob")
+                client_metadata.metadata_blob.update(new_metadata)
+                logging.info(f"Updated metadata_blob for client ID {client_id}. Old value: {old_metadata}, New value: {new_metadata}")
 
-        db.session.commit()
+            if "configuration_blob" in args:
+                old_configuration = client_configuration.configuration_blob
+                new_configuration = args.get("configuration_blob")
+                client_configuration.configuration_blob.update(new_configuration)
+                logging.info(f"Updated configuration_blob for client ID {client_id}. Old value: {old_configuration}, New value: {new_configuration}")
 
-        client_response_data = GetClientResponseSchema().dump({"client": client})
+            # Commit changes to the database
+            db.session.commit()
+            logging.info(f"Successfully updated client configuration for client ID {client_id}.")
 
-        return client
+            client_response_data = GetClientResponseSchema().dump({"client": client})
+            logging.info(f"Response data prepared for client ID {client_id}. Returning response.")
+
+            return client_response_data, http.HTTPStatus.OK
+
+        except Exception as e:
+            logging.error(f"Error occurred while updating client ID {client_id}. Error: {str(e)}", exc_info=True)
+            return {
+                'code': 500,
+                'status': 'Internal Server Error',
+                'message': 'An error occurred while updating the client configuration',
+                'errors': {'details': str(e)}
+            }, http.HTTPStatus.INTERNAL_SERVER_ERROR
 
     @client_api.response(status_code=http.HTTPStatus.NO_CONTENT)
     @client_api.alt_response(status_code=http.HTTPStatus.UNAUTHORIZED, schema=ErrorSchema, success=False)

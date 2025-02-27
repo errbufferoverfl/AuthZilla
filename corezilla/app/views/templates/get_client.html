@@ -1,317 +1,126 @@
 {% extends "base.html" %}
 
-{% block title %}Manage Client - {{ client_id }}{% endblock %}
+{% block title %}{{ client.client_name }} - Application Details{% endblock %}
 
 {% block content %}
-    <div class="container">
-        <h2 class="my-4 text-center">Manage Client - {{ client_id }}</h2>
+    <div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">{{ client.client_name }}</h2>
+        <span class="text-muted">Regular Web Applications</span>
+    </div>
+    <p>Client ID: <span class="badge bg-light text-dark">{{ client.client_id }}</span></p>
 
-        <form id="clientForm">
-            <!-- Basic Information Section -->
-            <div class="section-header mt-4 mb-2">
-                <h5>Basic Information</h5>
-            </div>
-            <div class="mb-3">
-                <label for="name" class="form-label">Client Name</label>
-                <input type="text" class="form-control" id="name" name="name" autocomplete="off" required>
-            </div>
-            <div class="mb-3">
-                <label for="client_id" class="form-label">Client ID</label>
-                <div class="input-group">
-                    <input type="text" class="form-control" id="client_id" name="client_id" readonly>
-                    <button class="btn btn-outline-secondary" type="button" id="copyButton">Copy</button>
-                </div>
-            </div>
-            <div class="mb-3">
-                <label for="client_secret" class="form-label">Client Secret</label>
-                <div class="input-group">
-                    <input type="password" class="form-control" id="client_secret" name="client_secret" readonly>
-                    <button class="btn btn-outline-secondary" type="button" id="toggleSecretButton">Show</button>
-                    <button class="btn btn-outline-secondary" type="button" id="copySecretButton">Copy</button>
-                </div>
-            </div>
-            <div class="mb-3">
-                <label for="description" class="form-label">Description</label>
-                <textarea class="form-control" id="description" name="description" rows="3" maxlength="250" placeholder="Add a description in less than 250 characters."></textarea>
-            </div>
+    <div class="container mt-4">
+        <ul class="nav nav-underline" id="settingsTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings-tab-pane" type="button" role="tab" aria-controls="settings-tab-pane" aria-selected="true">Settings</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="credentials-tab" data-bs-toggle="tab" data-bs-target="#credentials-tab-pane" type="button" role="tab" aria-controls="credentials-tab-pane" aria-selected="false">Credentials</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="apis-tab" data-bs-toggle="tab" data-bs-target="#apis-tab-pane" type="button" role="tab" aria-controls="apis-tab-pane" aria-selected="false">APIs</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="connections-tab" data-bs-toggle="tab" data-bs-target="#connections-tab-pane" type="button" role="tab" aria-controls="connections-tab-pane" aria-selected="false">Connections</button>
+            </li>
+        </ul>
 
-            <!-- Application Properties Section -->
-            <div class="section-header mt-4 mb-2">
-                <h5>Application Properties</h5>
-            </div>
-            <div class="mb-3">
-                <label for="logo" class="form-label">Logo</label>
-                <div class="mb-2">
-                    <img id="logoPreview" src="/static/imgs/default_logo.png" alt="Logo Preview" style="max-height: 100px; max-width: 100px;">
-                </div>
-                <input type="file" class="form-control" id="logo" name="logo" accept="image/*">
-            </div>
-            <div class="mb-3">
-                <label for="app_type" class="form-label">Application Type</label>
-                <select id="app_type" name="app_type" class="form-control" required>
-                    <option value="native">Native: Mobile, desktop, CLI</option>
-                    <option value="spa">Single Page Web Application</option>
-                    <option value="regular_web">Regular Web Application</option>
-                    <option value="m2m">Machine to Machine Application</option>
-                </select>
-            </div>
-
-            <!-- Application URIs Section -->
-            <div class="section-header mt-4 mb-2">
-                <h5>Application URIs</h5>
-            </div>
-            <div class="mb-3">
-                <label for="login_uri" class="form-label">App Login URI</label>
-                <input type="url" class="form-control" id="login_uri" name="login_uri">
-            </div>
-            <div class="mb-3">
-                <label for="redirect-uris-container" class="form-label">Redirect URIs</label>
-                <div id="redirect-uris-container">
-                    <div class="input-group mb-2 redirect-uri-group">
-                        <input type="url" class="form-control" name="redirect_uris[]" required>
-                        <button type="button" class="btn btn-outline-danger remove-redirect-uri">Delete</button>
+        <div class="tab-content mt-3" id="settingsTabContent">
+            <div class="tab-pane fade show active" id="settings-tab-pane" role="tabpanel" aria-labelledby="settings-tab" tabindex="0">
+                <div class="card p-4 mt-4">
+                    <h5>Basic Information</h5>
+                    <div class="mb-3">
+                        <label for="app_name" class="form-label">Name</label>
+                        <input type="text" id="app_name" class="form-control" value="{{ client.name }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="domain" class="form-label">Domain</label>
+                        <input type="text" id="domain" class="form-control" value="{{ client.domain }}" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="client_id" class="form-label">Client ID</label>
+                        <input type="text" id="client_id" class="form-control" value="{{ client.client_id }}" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="client_secret" class="form-label">Client Secret</label>
+                        <input type="password" id="client_secret" class="form-control" value="••••••••••••" readonly>
+                        <div id="client_secret_help" class="form-text">The Client Secret is not base64 encoded.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea id="description" class="form-control" rows="3" placeholder="Add a description in less than 140 characters."></textarea>
+                        <div id="description_help" class="form-text">A free text description of the application. Max character count is 140.</div>
                     </div>
                 </div>
-                <button type="button" id="add-redirect-uri" class="btn btn-outline-primary mt-2">+</button>
-                <small class="form-text text-muted">You can add up to 20 redirect URIs.</small>
-            </div>
-            <div class="mb-3">
-                <label for="logout_uris" class="form-label">Allowed Logout URIs</label>
-                <input type="text" class="form-control" id="logout_uris" name="logout_uris">
-            </div>
-            <div class="mb-3">
-                <label for="web_origins" class="form-label">Allowed Web Origins</label>
-                <input type="text" class="form-control" id="web_origins" name="web_origins">
-            </div>
+                <div class="card p-4 mt-4">
+                    <h5>Application Properties</h5>
 
-            <!-- Cross-Origin Authentication Section -->
-            <div class="section-header mt-4 mb-2">
-                <h5>Cross-Origin Authentication</h5>
-            </div>
-            <div class="mb-3">
-                <label for="cors_enabled" class="form-label">Cross-Origin Authentication Enabled?</label>
-                <select id="cors_enabled" name="cors_enabled" class="form-control">
-                    <option value="true">Yes</option>
-                    <option value="false">No</option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label for="allowed_origins" class="form-label">Allowed Origins (CORS)</label>
-                <input type="text" class="form-control" id="allowed_origins" name="allowed_origins">
-            </div>
-            <div class="mb-3">
-                <label for="cors_fallback" class="form-label">CORS Fallback URI</label>
-                <input type="url" class="form-control" id="cors_fallback" name="cors_fallback">
-            </div>
+                    <div class="mb-3">
+                        <label for="app_logo" class="form-label">Application Logo</label>
+                        <input type="file" class="form-control" id="app_logo">
+                        <div id="app_logo_help" class="form-text">
+                            The URL of the logo to display for the application. If none is set, the default badge for this type of application will be shown.
+                            Recommended size: <strong>150x150 pixels</strong>.
+                        </div>
+                    </div>
 
-            <!-- Refresh Token Settings Section -->
-            <div class="section-header mt-4 mb-2">
-                <h5>Refresh Token Expiration</h5>
-            </div>
-            <div class="mb-3">
-                <label for="idle_lifetime" class="form-label">Idle Refresh Token Lifetime</label>
-                <input type="number" class="form-control" id="idle_lifetime" name="idle_lifetime" value="1296000">
-            </div>
-            <div class="mb-3">
-                <label for="lifetime" class="form-label">Refresh Token Lifetime</label>
-                <input type="number" class="form-control" id="lifetime" name="lifetime">
-            </div>
-            <div class="mb-3">
-                <label for="max_lifetime" class="form-label">Maximum Refresh Token Lifetime</label>
-                <input type="number" class="form-control" id="max_lifetime" name="max_lifetime" value="2592000">
-            </div>
+                    <div class="mb-3">
+                        <label for="app_type" class="form-label">Application Type</label>
+                        <select class="form-select" id="app_type" aria-describedby="app_type_help">
+                            <option value="m2m">Machine to Machine</option>
+                            <option value="web" selected>Regular Web Application</option>
+                            <option value="native">Native</option>
+                            <option value="spa">Single Page App</option>
+                        </select>
+                        <div id="app_type_help" class="form-text">The type of application will determine which settings you can configure from the dashboard.</div>
+                    </div>
+                </div>
+                <div class="card p-4 mt-4">
+                    <h5>Application URIs</h5>
+                </div>
+                <div class="card p-4 mt-4">
+                    <h5>Cross-Origin Authentication</h5>
+                </div>
+                <div class="card p-4 mt-4">
+                    <h5>ID Token Expiration</h5>
+                </div>
+                <div class="card p-4 mt-4">
+                    <h5>Refresh Token Expiration</h5>
+                </div>
+                <div class="card p-4 mt-4">
+                    <h5>Refresh Token Rotation</h5>
+                </div>
+                <div class="card p-4 mt-4">
+                    <h5>Token Sender-Constraining</h5>
+                </div>
+                <div class="card p-4 mt-4">
+                    <h5>Authorization Requests</h5>
+                </div>
+                <div class="card p-4 mt-4">
+                    <h5>Advanced Settings</h5>
+                </div>
 
-            <!-- Token Sender Constraining -->
-            <div class="section-header mt-4 mb-2">
-                <h5>Token Sender Constraining</h5>
+                <div class="tab-pane fade" id="credentials-tab-pane" role="tabpanel" aria-labelledby="credentials-tab" tabindex="0">
+                    <h3>Credentials Content</h3>
+                    <p>This is the credentials tab content.</p>
+                </div>
+                <div class="tab-pane fade" id="apis-tab-pane" role="tabpanel" aria-labelledby="apis-tab" tabindex="0">
+                    <h3>APIs Content</h3>
+                    <p>This is the APIs tab content.</p>
+                </div>
+                <div class="tab-pane fade" id="connections-tab-pane" role="tabpanel" aria-labelledby="connections-tab" tabindex="0">
+                    <h3>Connections Content</h3>
+                    <p>This is the connections tab content.</p>
+                </div>
             </div>
-            <div class="mb-3">
-                <label for="sender_constraining" class="form-label">Enable Token Sender Constraining</label>
-                <select id="sender_constraining" name="sender_constraining" class="form-control">
-                    <option value="true">Yes</option>
-                    <option value="false">No</option>
-                </select>
-            </div>
+        </div>
 
-            <!-- Advanced Settings -->
-            <div class="section-header mt-4 mb-2">
-                <h5>Advanced Settings</h5>
-            </div>
-            <div class="mb-3">
-                <label for="jwt_algorithm" class="form-label">JWT Signature Algorithm</label>
-                <select id="jwt_algorithm" name="jwt_algorithm" class="form-control" disabled>
-                    <option value="RS256">RS256</option>
-                    <option value="HS256">HS256</option>
-                    <option value="PS256">PS256</option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label for="oidc_conformant" class="form-label">OIDC Conformant</label>
-                <select id="oidc_conformant" name="oidc_conformant" class="form-control" disabled>
-                    <option value="true">Yes</option>
-                    <option value="false">No</option>
-                </select>
-            </div>
-
-            <!-- Application Authentication Section -->
-            <div id="auth_method_section" class="section-header mt-4 mb-2" style="display: none;">
-                <h5>Application Authentication</h5>
-            </div>
-            <div id="auth_method_fields" class="mb-3" style="display: none;">
-                <label for="auth_method" class="form-label">Authentication Method</label>
-                <select id="auth_method" name="auth_method" class="form-control">
-                    <option value="mtls_ca">mTLS (CA-Signed)</option>
-                    <option value="mtls_self">mTLS (Self-Signed)</option>
-                    <option value="private_key_jwt">Private Key JWT</option>
-                    <option value="client_secret_post">Client Secret (Post)</option>
-                    <option value="client_secret_basic">Client Secret (Basic)</option>
-                    <option value="none">None</option>
-                </select>
-            </div>
-
-            <!-- Submit Button -->
-            <button type="submit" class="btn btn-primary">Save Changes</button>
-        </form>
-
-        <!-- Success or error messages -->
-        <div id="responseMessage" class="mt-3"></div>
+        <div class="text-end mt-3">
+            <button class="btn btn-primary">Save Changes</button>
+        </div>
     </div>
 {% endblock %}
 {% block js_footer %}
-    <script>
-        let clientId;
-        const clientLink = "/api/clients/{{ client_id }}"
-
-        // Initial client retrieval or creation on page load
-        document.addEventListener("DOMContentLoaded", function () {
-            fetch(clientLink, {
-                method: 'GET',
-                headers: {'Content-Type': 'application/json'}
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data) {
-                        loadClientData(data);
-                    }
-                })
-                .catch(error => {
-                    document.getElementById('responseMessage').innerHTML = `
-                    <div class="alert alert-danger">Error loading client: ${error.message}</div>`;
-                });
-        });
-
-        function loadClientData(client) {
-            clientId = client.client_id;
-            document.getElementById('client_id').value = clientId;
-            document.getElementById('name').value = client.name;
-            document.getElementById('client_secret').value = client.client_secret;
-            document.getElementById('description').value = client.metadata?.description;
-            document.getElementById('logoPreview').src = client.metadata?.logo_uri;
-            document.getElementById('app_type').value = client.client_type;
-
-            // Populate other fields as required by your data structure
-            // Example for Application URIs:
-            document.getElementById('login_uri').value = client.configuration?.uris?.app_login_uri;
-            client.configuration?.uris?.redirect_uris?.forEach(uri => addRedirectUri(uri));
-            document.getElementById('logout_uris').value = client.configuration?.uris?.logout_uris.join(', ');
-            document.getElementById('web_origins').value = client.configuration?.uris?.web_origins.join(', ');
-        }
-
-        // Toggle visibility of client secret
-        document.getElementById('toggleSecretButton').addEventListener('click', function () {
-            const clientSecretInput = document.getElementById('client_secret');
-            if (clientSecretInput.type === "password") {
-                clientSecretInput.type = "text";
-                this.textContent = "Hide";
-            } else {
-                clientSecretInput.type = "password";
-                this.textContent = "Show";
-            }
-        });
-
-        // Copy client secret to clipboard
-        document.getElementById('copySecretButton').addEventListener('click', function () {
-            const clientSecretInput = document.getElementById('client_secret');
-            clientSecretInput.select();
-            document.execCommand('copy');
-            this.textContent = 'Copied!';
-            setTimeout(() => {
-                this.textContent = 'Copy';
-            }, 2000);
-        });
-
-        // Function to add new redirect URI inputs
-        function addRedirectUri(uri) {
-            const container = document.getElementById('redirect-uris-container');
-            const newRedirectUriGroup = document.createElement('div');
-            newRedirectUriGroup.className = 'input-group mb-2 redirect-uri-group';
-            newRedirectUriGroup.innerHTML = `
-            <input type="url" class="form-control" name="redirect_uris[]" value="${uri || ''}" required>
-            <button type="button" class="btn btn-outline-danger remove-redirect-uri">Delete</button>
-        `;
-            container.appendChild(newRedirectUriGroup);
-        }
-
-        // Handle form submission for updating the client
-        document.getElementById('clientForm').addEventListener('submit', function (event) {
-            event.preventDefault();
-
-            const redirectUris = Array.from(document.querySelectorAll('[name="redirect_uris[]"]'))
-                .map(input => input.value);
-
-            const formData = {
-                name: document.getElementById('name').value,
-                metadata: {
-                    description: document.getElementById('description').value,
-                    logo_uri: document.getElementById('logo').value
-                },
-                configuration: {
-                    uris: {
-                        app_login_uri: document.getElementById('login_uri').value,
-                        redirect_uris: redirectUris,
-                        logout_uris: document.getElementById('logout_uris').value.split(',').map(uri => uri.trim()),
-                        web_origins: document.getElementById('web_origins').value.split(',').map(origin => origin.trim())
-                    },
-                    cors: {
-                        is_enabled: document.getElementById('cors_enabled').value === 'true',
-                        allowed_origins: document.getElementById('allowed_origins').value.split(',').map(origin => origin.trim()),
-                        fallback_url: document.getElementById('cors_fallback').value
-                    },
-                    refresh: {
-                        idle_refresh_token_lifetime: parseInt(document.getElementById('idle_lifetime').value, 10),
-                        rotation_overlap_period: parseInt(document.getElementById('lifetime').value, 10),
-                        maximum_refresh_token_lifetime: parseInt(document.getElementById('max_lifetime').value, 10)
-                    },
-                    jwt: {
-                        algorithm: document.getElementById('jwt_algorithm').value
-                    },
-                    token_endpoint_auth_method: document.getElementById('auth_method').value,
-                    oidc_conformant: document.getElementById('oidc_conformant').value === 'true',
-                    sender_constrained: document.getElementById('sender_constraining').value === 'true'
-                }
-            };
-
-            fetch(clientLink, {
-                method: 'PATCH',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(formData)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    const responseMessageDiv = document.getElementById('responseMessage');
-                    if (data.client) {
-                        responseMessageDiv.innerHTML = `
-                    <div class="alert alert-success" role="alert">Client updated successfully</div>`;
-                    } else {
-                        responseMessageDiv.innerHTML = `
-                    <div class="alert alert-danger" role="alert">${data.message || 'An error occurred'}</div>`;
-                    }
-                })
-                .catch(error => {
-                    document.getElementById('responseMessage').innerHTML = `
-                <div class="alert alert-danger" role="alert">Error: ${error.message}</div>`;
-                });
-        });
-
-    </script>
+    {{ super() }}
 {% endblock %}

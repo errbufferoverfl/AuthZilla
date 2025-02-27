@@ -13,7 +13,7 @@ class ClientMetadata(db.Model):
     """A model representing metadata information for a client application.
 
     This model stores metadata that provides descriptive details about a client.
-    The `metadata_blob` field is a JSON object that includes key
+    The `metadata_blob` field is a JSO`N object that includes key
     attributes like the description, logo, terms of service (TOS), and various
     contact URLs relevant to the app's policies and contacts.
 
@@ -44,7 +44,6 @@ class ClientMetadata(db.Model):
             "privacy_contact": "privacy@example.com"
         }
         ```
-
     Table:
         client_metadata
 
@@ -195,12 +194,13 @@ class Client(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # Internal auto-incrementing ID
     client_id = db.Column(db.String(30), unique=True, nullable=False, index=True)  # Public client ID
     client_name = db.Column(db.String(255), nullable=True, default="New Client")
-    _client_secret = db.Column(db.String, nullable=True)
     client_uri = db.Column(db.String, nullable=True)
     is_public = db.Column(db.Boolean, default=False)
     app_type = db.Column(db.String, nullable=False, default="web")
 
-    # Foreign key to the User model, referencing the correct table and column
+    _client_secret = db.Column(db.String, nullable=True)
+
+    # Foreign key to the User model
     user_id = db.Column(db.Integer, db.ForeignKey("user.fs_uniquifier"), nullable=False)
 
     # Relationship with the User model (one-to-many)
@@ -239,7 +239,7 @@ class Client(db.Model):
 
     @staticmethod
     def _generate_client_secret():
-        prefix = "AZL"
+        prefix = "AZL-CS"
 
         # Generate a high-entropy random string (e.g., 32 characters)
         random_part = secrets.token_urlsafe(128)

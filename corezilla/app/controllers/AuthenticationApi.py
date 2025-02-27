@@ -1,13 +1,16 @@
 import http
+import logging
 
+import sqlalchemy
 from flask.views import MethodView
-from flask_security import login_user
+from flask_security import login_user, logout_user
 from flask_smorest import Blueprint
 from flask_smorest.error_handler import ErrorSchema
 
 from corezilla.app import db
 from corezilla.app.models.User import User
 from corezilla.app.schemas.user_schema import LoginUserRequest, RegisterUserRequest, UserResponseSchema
+from corezilla.app.services.UserService import UserService
 
 auth_api = Blueprint("auth", "auth", url_prefix="/api/auth", description="User authentication endpoints")
 
@@ -41,7 +44,17 @@ class AuthenticationApi(MethodView):
         password = args.get("password")
 
         # Assuming User has 'username' and 'email' fields
-        user = User.query.filter((User.email == email_or_username) | (User.username == email_or_username)).first()
+        try:
+            user = UserService.get_user_by_username_or_email(email_or_username)
+        except sqlalchemy.exc.InvalidRequestError as e:
+            logging.exception(e)
+            return {
+                'code': 500,
+                'status': 'Internal Server Error',
+                'message': 'Unhandled Exception',
+                'errors': {}
+            }, http.HTTPStatus.INTERNAL_SERVER_ERROR
+
 
         if user and user.verify_password(password):
             login_user(user)
@@ -53,6 +66,15 @@ class AuthenticationApi(MethodView):
             'errors': {}
         }, http.HTTPStatus.BAD_REQUEST
 
+@auth_api.route("/logout")
+class LogoutApi(MethodView):
+    @auth_api.response(status_code=http.HTTPStatus.OK, schema=UserResponseSchema, example={"message": "Logout successful"})
+    def post(self):
+        """
+        Logout the current user.
+        """
+        logout_user()
+        return {'message': 'Logout successful'}, http.HTTPStatus.OK
 
 @auth_api.route('/register')
 class RegisterApi(MethodView):
@@ -84,7 +106,7 @@ class RegisterApi(MethodView):
                 'errors': {}
             }, http.HTTPStatus.BAD_REQUEST
 
-        if User.query.filter_by(email=email).first() or User.query.filter_by(username=username).first():
+        if UserService.get_user_by_username(username) or UserService.get_user_by_email(email):
             return {
                 'code': 400,
                 'status': 'Bad Request',

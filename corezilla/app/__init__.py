@@ -114,16 +114,23 @@ def register_blueprints(app: Flask):
     Args:
         app (Flask): The Flask application instance
     """
-    from corezilla.app.controllers.auth_api_controller import auth_api
-    from corezilla.app.controllers.oauth_api_controller import oauth_api
-    from corezilla.app.controllers.user_api_controller import user_api
-    from corezilla.app.controllers.client_api_controller import client_api
+    from corezilla.app.controllers.AuthenticationApi import auth_api
+    from corezilla.app.controllers.AuthorizationApi import oauth_api
+    from corezilla.app.controllers.UserAPI import user_api
+    from corezilla.app.controllers.ClientsApi import client_api
 
-    from corezilla.app.controllers.web_controller import core_web
+    from corezilla.app.controllers.WebController import core_web
 
     # Register core, user, and auth blueprints
     api.register_blueprint(auth_api)
     api.register_blueprint(oauth_api)
+
+    if app.config.get("ENABLE_SAML"):
+        pass
+
+    if app.config.get("ENABLE_OIDC"):
+        pass
+
     api.register_blueprint(user_api)
     api.register_blueprint(client_api)
 

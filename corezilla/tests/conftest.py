@@ -1,7 +1,12 @@
+import http
+import secrets
 from pydoc import describe
 
+import flask_login
 import pytest
-from corezilla.app import create_app, db
+from flask import url_for
+
+from corezilla.app import create_app, db, login_manager
 from corezilla.app.models import Client, ClientMetadata, ClientConfiguration
 from corezilla.app.models.User import User
 from corezilla.config.test import TestConfiguration
@@ -35,7 +40,7 @@ def user(db_session):
 
 
 @pytest.fixture
-def client(db_session, user):
+def oauth_client(db_session, user):
     """A fixture that creates and returns a test client object."""
     client = Client(owner=user, name="Test Client")
     db_session.add(client)
@@ -78,3 +83,17 @@ def client(db_session, user):
     db_session.add_all([client_metadata, client_configuration])
     db_session.commit()
     return client
+
+
+@pytest.fixture
+def auth_config(app):
+    """Mock Flask app configuration for authorization codes."""
+    app.config["ISSUER_NAME"] = "https://authzilla.example.com"
+    app.config["AUDIENCE"] = "https://example.invalid"
+    app.config["AUTH_CODE_EXPIRY_SECONDS"] = 600  # 10 minutes
+    app.config["AUTH_CODE_SECRET_KEY"] = secrets.token_bytes(32)  # Secure key
+    app.config["JWT_ALGORITHM"] = "HS256"
+    app.config["ACCESS_TOKEN_EXPIRE_MINUTES"] = 60
+    app.config["REFRESH_TOKEN_EXPIRE_MINUTES"] = 43200
+    app.config["SECRET_KEY"] = "super-secret-key"  # Secure in production
+    return app.config

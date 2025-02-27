@@ -1,4 +1,4 @@
-from marshmallow import Schema, fields, validate
+from marshmallow import Schema, fields, validate, ValidationError, validates_schema
 
 
 class URIsSchema(Schema):
@@ -26,12 +26,28 @@ class CORSConfigSchema(Schema):
     )
     allowed_origins = fields.List(
         fields.Url(schemes=["https"]),
-        description="List of allowed origins for CORS requests."
+        description="List of allowed origins for CORS requests.",
+        allow_none=True,
     )
     fallback_url = fields.Url(
         schemes=["https"],
-        description="Fallback URL for CORS requests when an origin is not explicitly allowed."
+        description="Fallback URL for CORS requests when an origin is not explicitly allowed.",
+        allow_none=True,
     )
+
+    @validates_schema
+    def validate_fields_when_enabled(self, data, **kwargs):
+        if data.get("is_enabled"):
+            # Validate allowed_origins
+            if not data.get("allowed_origins"):
+                raise ValidationError(
+                    {"allowed_origins": "This field must be populated when CORS is enabled."}
+                )
+            # Validate fallback_url
+            if not data.get("fallback_url"):
+                raise ValidationError(
+                    {"fallback_url": "This field must be populated when CORS is enabled."}
+                )
 
 
 class RefreshTokenSettingsSchema(Schema):
@@ -39,24 +55,47 @@ class RefreshTokenSettingsSchema(Schema):
         description="Whether refresh token rotation is enabled."
     )
     rotation_overlap_period = fields.Integer(
-        description="Period, in seconds, for which an old refresh token remains valid during rotation."
+        description="Period, in seconds, for which an old refresh token remains valid during rotation.",
+        allow_none=True,
     )
     idle_refresh_token_lifetime_enabled = fields.Bool(
         description="Indicates if idle refresh token lifetime is enforced."
     )
     idle_refresh_token_lifetime = fields.Integer(
-        description="Lifetime of an idle refresh token in seconds."
+        description="Lifetime of an idle refresh token in seconds.",
+        allow_none=True,
     )
     maximum_refresh_token_lifetime_enabled = fields.Bool(
         description="Indicates if a maximum lifetime for refresh tokens is enforced."
     )
     maximum_refresh_token_lifetime = fields.Integer(
-        description="Maximum allowed lifetime of a refresh token in seconds."
+        description="Maximum allowed lifetime of a refresh token in seconds.",
+        allow_none=True,
     )
+
+    @validates_schema
+    def validate_fields(self, data, **kwargs):
+        # Validate rotation_overlap_period if refresh_token_rotation_enabled is True
+        if data.get("refresh_token_rotation_enabled") and data.get("rotation_overlap_period") is None:
+            raise ValidationError(
+                {"rotation_overlap_period": "This field must be populated when rotation is enabled."}
+            )
+
+        # Validate idle_refresh_token_lifetime if idle_refresh_token_lifetime_enabled is True
+        if data.get("idle_refresh_token_lifetime_enabled") and data.get("idle_refresh_token_lifetime") is None:
+            raise ValidationError(
+                {"idle_refresh_token_lifetime": "This field must be populated when idle lifetime enforcement is enabled."}
+            )
+
+        # Validate maximum_refresh_token_lifetime if maximum_refresh_token_lifetime_enabled is True
+        if data.get("maximum_refresh_token_lifetime_enabled") and data.get("maximum_refresh_token_lifetime") is None:
+            raise ValidationError(
+                {"maximum_refresh_token_lifetime": "This field must be populated when maximum lifetime enforcement is enabled."}
+            )
 
 
 class JWTSettingsSchema(Schema):
-    algorithm = fields.Str(
+    algorithm = fields.String(
         description="Algorithm used for signing JWT tokens."
     )
 
@@ -68,7 +107,7 @@ class ConfigurationBlobSchema(Schema):
     sender_constrained = fields.Bool(
         description="Indicates if tokens are constrained to the sender."
     )
-    token_endpoint_auth_method = fields.Str(
+    token_endpoint_auth_method = fields.String(
         description="Method of authentication at the token endpoint."
     )
     uris = fields.Nested(
@@ -101,11 +140,11 @@ class CreateClientRequest(Schema):
 
 class ReadClientRequest(Schema):
     """Schema for reading client requests with pagination parameters."""
-    page = fields.Int(
+    page = fields.Integer(
         validate=validate.Range(min=1),
         description="Page number to retrieve, defaults to 1"
     )
-    per_page = fields.Int(
+    per_page = fields.Integer(
         validate=validate.Range(min=1, max=100),
         description="Number of items per page, defaults to 50, maximum 100"
     )

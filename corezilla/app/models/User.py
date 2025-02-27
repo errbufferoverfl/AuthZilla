@@ -11,16 +11,24 @@ from corezilla.app import db
 
 class RolesUsers(db.Model):
     __tablename__ = "roles_users"
+
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column("user_id", db.String, db.ForeignKey("user.fs_uniquifier"))
     role_id = db.Column("role_id", db.Integer, db.ForeignKey("role.id"))
 
+    def __repr__(self):
+        return f"<RolesUsers(user_id={self.user_id}, role_id={self.role_id})>"
+
 
 class Role(db.Model, RoleMixin):
     __tablename__ = "role"
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True)
     description = db.Column(db.String(255))
+
+    def __repr__(self):
+        return f"<Role(name={self.name})>"
 
 
 class User(db.Model, UserMixin):
@@ -57,15 +65,26 @@ class User(db.Model, UserMixin):
         cascade="all, delete-orphan"
     )
 
+    # One-to-many relationship with Connections
+    connections = db.relationship("AuthenticationConnection", back_populates="owner", cascade="all, delete-orphan")
+
     def __init__(self, username, password, **kwargs):
         super().__init__(**kwargs)
         self.fs_uniquifier = self.generate_user_id()
         self.username = username
         self.password = password
 
-    """
-    Username
-    """
+    def __repr__(self):
+        return f"<User(username={self.username}, email={self.email})>"
+
+    def __eq__(self, other):
+        if isinstance(other, User):
+            return self.fs_uniquifier == other.fs_uniquifier
+        return False
+
+    def __hash__(self):
+        return hash(self.fs_uniquifier)
+
     @staticmethod
     def generate_user_id():
         return f"us-{Xid().string()}"
@@ -82,9 +101,6 @@ class User(db.Model, UserMixin):
     def user_id(self):
         raise AttributeError("'id' is not a deletable attribute.")
 
-    """
-    Password
-    """
     @property
     def password(self):
         return self._password
@@ -118,3 +134,16 @@ class ClientOwners(db.Model):
     user_id = db.Column(db.String, db.ForeignKey('user.fs_uniquifier'), primary_key=True)
     client_id = db.Column(db.String, db.ForeignKey('client.id'), primary_key=True)
     created_at = db.Column(db.DateTime, default=datetime.datetime.now(datetime.timezone.utc), nullable=False)
+
+    def __repr__(self):
+        return f"<ClientOwners(user_id={self.user_id}, client_id={self.client_id})>"
+
+
+class ConnectionOwners(db.Model):
+    __tablename__ = "connection_owners"
+    user_id = db.Column(db.String, db.ForeignKey('user.fs_uniquifier'), primary_key=True)
+    client_id = db.Column(db.String, db.ForeignKey('authentication_connection.id'), primary_key=True)
+    created_at = db.Column(db.DateTime, default=datetime.datetime.now(datetime.timezone.utc), nullable=False)
+
+    def __repr__(self):
+        return f"<ConnectionOwners(user_id={self.user_id}, client_id={self.client_id})>"

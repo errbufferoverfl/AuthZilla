@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}New SAML Connection{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h2 class="mb-4">New SAML Connection</h2>
+        <div class="card p-4">
+            <div class="card-body">
+                <form>
+                    <fieldset>
+                        <legend>General</legend>
+
+                        <div class="mb-3">
+                            <label for="connection-name" class="form-label">Connection name <span class="text-danger">*</span></label>
+                            <input type="text" id="connection-name" class="form-control" required>
+                            <div class="form-text">This is a logical identifier of the connection. This name cannot be changed.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="signin-url" class="form-label">Sign In URL <span class="text-danger">*</span></label>
+                            <input type="url" id="signin-url" class="form-control" value="https://samplp.example.com/login" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="x509-cert" class="form-label">X509 Signing Certificate <span class="text-danger">*</span></label>
+                            <input type="file" id="x509-cert" class="form-control" required>
+                            <div class="form-text">SAML server public key encoded in PEM or CER format.</div>
+                        </div>
+
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="enable-signout" checked>
+                            <label class="form-check-label" for="enable-signout">Enable Sign Out</label>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="signout-url" class="form-label">Sign Out URL</label>
+                            <input type="url" id="signout-url" class="form-control" value="https://samplp.example.com/logout">
+                            <div class="form-text">Optional: when empty, this field defaults to the Sign In URL.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="user-id-attribute" class="form-label">User ID Attribute</label>
+                            <input type="text" id="user-id-attribute" class="form-control" value="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier">
+                            <div class="form-text">Optional: This is the attribute in the SAML token that will be mapped to the user_id property.</div>
+                        </div>
+
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="debug-mode">
+                            <label class="form-check-label" for="debug-mode">Debug Mode</label>
+                            <div class="form-text">Include more verbose logging during the authentication process.</div>
+                        </div>
+
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="sign-request" checked>
+                            <label class="form-check-label" for="sign-request">Sign Request</label>
+                            <div class="form-text">When enabled, the SAML authentication request will be signed.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="sign-algorithm" class="form-label">Sign Request Algorithm</label>
+                            <select id="sign-algorithm" class="form-select">
+                                <option selected>Select an algorithm</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="protocol-binding" class="form-label">Protocol Binding</label>
+                            <input type="text" id="protocol-binding" class="form-control">
+                            <div class="form-text">Applies only to the SAML Request Binding. The SAML Response Binding only supports HTTP-POST.</div>
+                        </div>
+                    </fieldset>
+
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

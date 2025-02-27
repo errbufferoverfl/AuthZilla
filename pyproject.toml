@@ -25,6 +25,8 @@ python3-xid = "^1.0.5"
 setuptools = "^75.1.0"
 requests = "^2.32.3"
 argon2-cffi = "^23.1.0"
+pyjwt = "^2.10.1"
+cryptography = "^44.0.1"
 
 
 [tool.poetry.group.dev.dependencies]

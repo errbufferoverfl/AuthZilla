@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}New OpenID Connect Connection{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h2 class="mb-4">New OpenID Connect Connection</h2>
+        <div class="card">
+            <div class="card-body">
+                <form>
+                    <fieldset>
+                        <legend>General</legend>
+
+                        <!-- Connection Name -->
+                        <div class="mb-3">
+                            <label for="connection-name" class="form-label">Connection Name <span class="text-danger">*</span></label>
+                            <input type="text" id="connection-name" class="form-control" required>
+                            <div class="form-text text-danger">"Connection Name" is required</div>
+                        </div>
+
+                        <!-- OpenID Connect Discovery URL -->
+                        <div class="mb-3">
+                            <label for="discovery-url" class="form-label">OpenID Connect Discovery URL <span class="text-danger">*</span></label>
+                            <input type="text" id="discovery-url" class="form-control" disabled value="https://id.mydomain.com/.well-known/openid-configuration">
+                            <div class="form-text">Provide the well-known OpenID Connect discovery endpoint. Alternatively, you can <a href="#">upload metadata</a>.</div>
+                        </div>
+
+                        <!-- Communication Channel -->
+                        <div class="mb-3">
+                            <label class="form-label">Communication Channel <span class="text-danger">*</span></label>
+                            <div class="form-check">
+                                <input type="radio" id="back-channel" name="communication-channel" class="form-check-input">
+                                <label for="back-channel" class="form-check-label">Back Channel (Uses <code>response_type=code</code>)</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="radio" id="front-channel" name="communication-channel" class="form-check-input" checked>
+                                <label for="front-channel" class="form-check-label">Front Channel (Uses <code>response_mode=form_post</code> and <code>response_type=id_token</code>)</label>
+                            </div>
+                        </div>
+
+                        <!-- Client ID -->
+                        <div class="mb-3">
+                            <label for="client-id" class="form-label">Client ID <span class="text-danger">*</span></label>
+                            <input type="text" id="client-id" class="form-control" required>
+                            <div class="form-text">Obtaining the Client ID differs across providers. Please check your provider's documentation.</div>
+                        </div>
+
+                        <!-- Callback URL -->
+                        <div class="mb-3">
+                            <label for="callback-url" class="form-label">Callback URL</label>
+                            <input type="text" id="callback-url" class="form-control" disabled value="https://dev-547q7gtp.au.auth0.com/login/callback">
+                            <div class="form-text">You may need to configure the OIDC Issuer with this callback URL.</div>
+                        </div>
+                    </fieldset>
+
+                    <!-- Advanced Settings -->
+                    <fieldset>
+                        <legend>Advanced</legend>
+                        <div class="form-check form-switch">
+                            <input type="checkbox" id="sync-attributes" class="form-check-input" checked>
+                            <label for="sync-attributes" class="form-check-label">Sync user profile attributes at each login</label>
+                        </div>
+                    </fieldset>
+
+                    <!-- Submit Button -->
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary" disabled>Create</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

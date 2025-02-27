@@ -4,10 +4,10 @@ from http import HTTPStatus
 from corezilla.app.models.Client import Client, ClientMetadata, ClientConfiguration
 
 
-@pytest.mark.usefixtures("client", "user", "db_session")
+@pytest.mark.usefixtures("oauth_client", "user", "db_session")
 class TestClientsAPI:
 
-    def test_get_clients(self, client, app, user):
+    def test_get_clients(self, app, user, oauth_client):
         with app.test_client() as test_client:
             # Simulate login by setting session variables directly
             with test_client.session_transaction() as session:
@@ -81,7 +81,7 @@ class TestClientsAPI:
             assert "client" in data
             assert data["client"]["name"] == "New Test Client"
 
-    def test_get_single_client(self, client, app, user):
+    def test_get_single_client(self, oauth_client, app, user):
         with app.test_client() as test_client:
             # Simulate login by setting session variables directly
             with test_client.session_transaction() as session:
@@ -89,15 +89,15 @@ class TestClientsAPI:
                 session['_fresh'] = True  # Ensure the session is marked as fresh
 
             # GET request for a single client
-            response = test_client.get(f'/api/clients/{client.client_id}')
+            response = test_client.get(f'/api/clients/{oauth_client.client_id}')
             data = response.get_json()
 
             # Assertions
             assert response.status_code == HTTPStatus.OK
             assert "client" in data
-            assert data["client"]["client_id"] == client.client_id
+            assert data["client"]["client_id"] == oauth_client.client_id
 
-    def test_put_update_client(self, client, app, user):
+    def test_put_update_client(self, oauth_client, app, user):
         with app.test_client() as test_client:
             # Simulate login
             with test_client.session_transaction() as session:
@@ -115,7 +115,7 @@ class TestClientsAPI:
             }
 
             response = test_client.put(
-                f'/api/clients/{client.client_id}',
+                f'/api/clients/{oauth_client.client_id}',
                 data=json.dumps(updated_data),
                 content_type="application/json"
             )
@@ -127,7 +127,7 @@ class TestClientsAPI:
             assert data["client"]["name"] == "Updated Test Client"
             assert data["client"]["metadata"]["description"] == "Updated description"
 
-    def test_patch_partial_update_client(self, client, app, user):
+    def test_patch_partial_update_client(self, oauth_client, app, user):
         with app.test_client() as test_client:
             # Simulate login by setting session variables directly
             with test_client.session_transaction() as session:
@@ -141,7 +141,7 @@ class TestClientsAPI:
             }
 
             response = test_client.patch(
-                f'/api/clients/{client.client_id}',
+                f'/api/clients/{oauth_client.client_id}',
                 data=json.dumps(partial_update_data),
                 content_type="application/json"
             )
@@ -153,7 +153,7 @@ class TestClientsAPI:
             assert data["client"]["name"] == "Partially Updated Client"
             assert data["client"]["metadata"]["description"] == "Partially updated description"
 
-    def test_delete_client(self, client, app, user):
+    def test_delete_client(self, oauth_client, app, user):
         with app.test_client() as test_client:
             # Simulate login by setting session variables directly
             with test_client.session_transaction() as session:
@@ -161,11 +161,11 @@ class TestClientsAPI:
                 session['_fresh'] = True  # Ensure the session is marked as fresh
 
             # DELETE request for client deletion
-            response = test_client.delete(f'/api/clients/{client.client_id}')
+            response = test_client.delete(f'/api/clients/{oauth_client.client_id}')
 
             # Assertions
             assert response.status_code == HTTPStatus.NO_CONTENT
 
             # Confirm deletion
-            response = test_client.get(f'/api/clients/{client.client_id}')
+            response = test_client.get(f'/api/clients/{oauth_client.client_id}')
             assert response.status_code == HTTPStatus.NOT_FOUND

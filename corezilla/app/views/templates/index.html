@@ -4,15 +4,43 @@
 
 {% block content %}
     <div class="text-center">
-        <h1>Welcome to {{ title }}</h1>
-        <p class="lead">Please log in or register to continue.</p>
 
         {% if not current_user.is_authenticated %}
+            <h1>Welcome to {{ title }}</h1>
+            <p class="lead">Please log in or register to continue.</p>
+
             <a href="{{ url_for('security.login') }}" class="btn btn-primary me-3">Login</a>
             <a href="{{ url_for('security.register') }}" class="btn btn-primary me-3">Register</a>
         {% else %}
-            <p class="lead">You are already logged in. Enjoy exploring our site!</p>
-            <a href="{{ url_for('security.logout') }}" class="btn btn-danger me-3">Logout</a>
+                <div class="container mt-4">
+                    <h2 class="mb-4">Dashboard</h2>
+                    <div class="list-group">
+
+                        <div class="d-flex justify-content-between align-items-center py-3 border-bottom">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-box me-3" style="font-size: 1.5rem;"></i>
+                                <a href="/clients" class="text-primary text-decoration-none">Applications</a>
+                            </div>
+                            <div>
+                                <a href="/clients" class="text-dark ms-3">Browse &rsaquo;</a>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center py-3 border-bottom">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-box me-3" style="font-size: 1.5rem;"></i>
+                                <a href="/connections" class="text-primary text-decoration-none">Connections</a>
+                            </div>
+                            <div>
+                                <a href="/clients" class="text-dark ms-3">Browse &rsaquo;</a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            <div class="container mt-4">
+                <a href="{{ url_for('security.logout') }}" class="btn btn-danger me-3">Logout</a>
+            </div>
         {% endif %}
     </div>
 {% endblock %}

@@ -69,3 +69,22 @@ class Configuration(object):
         "schema-hide-read-only": "never",
         "default-schema-tab": "example",
     }
+
+    """AuthZilla Configuration"""
+    ENABLE_OAUTH2 = False
+    ENABLE_SAML = True
+    ENABLE_OIDC = False
+
+    """Access Token Configuration"""
+    ISSUER_NAME = "https://authzilla.invalid"
+    ACCESS_TOKEN_SECRET = "this-is-a-secret"
+    ACCESS_TOKEN_EXPIRE_SECONDS = 3600
+    REFRESH_TOKEN_EXPIRE_SECONDS = 2592000
+    ACCESS_TOKEN_ALGORITHM = "HS256"
+
+    """Authorization Code Configuration"""
+    AUTH_CODE_SECRET_KEY = "this-is-a-secret"
+    AUTH_CODE_EXPIRY_SECONDS = 600
+    AUTH_CODE_ALGORITHM = "HS256"
+
+
